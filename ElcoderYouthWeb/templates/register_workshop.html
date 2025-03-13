@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Register for Workshop{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Workshop Registration</h2>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">{{ workshop.title }}</h3>
+                    <p class="card-text">{{ workshop.description }}</p>
+                    
+                    <div class="workshop-details mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Workshop Details</h4>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-calendar-event"></i> <strong>Date:</strong> {{ workshop.date.strftime('%B %d, %Y') }}</li>
+                                    <li><i class="bi bi-clock"></i> <strong>Time:</strong> {{ workshop.date.strftime('%I:%M %p') }}</li>
+                                    <li><i class="bi bi-hourglass-split"></i> <strong>Duration:</strong> {{ workshop.duration }} minutes</li>
+                                    <li><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ workshop.location }}</li>
+                                    <li><i class="bi bi-people"></i> <strong>Availability:</strong> {{ workshop.current_participants }}/{{ workshop.max_participants }} spots filled</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>Instructor</h4>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="instructor-avatar me-3">
+                                        {% if workshop.instructor.profile_image %}
+                                        <img src="{{ url_for('static', filename='uploads/profile_pics/' + workshop.instructor.profile_image) }}" alt="{{ workshop.instructor.username }}" class="rounded-circle" width="50" height="50">
+                                        {% else %}
+                                        <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #6c757d; color: white;">
+                                            {{ workshop.instructor.username[0].upper() }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">{{ workshop.instructor.username }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="registration-confirmation">
+                        <h4>Confirm Registration</h4>
+                        <p>By registering for this workshop, you agree to attend the session at the specified date and time.</p>
+                        
+                        <form method="POST">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="confirmAttendance" required>
+                                <label class="form-check-label" for="confirmAttendance">
+                                    I confirm that I will attend this workshop
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Complete Registration</button>
+                            <a href="{{ url_for('workshop') }}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

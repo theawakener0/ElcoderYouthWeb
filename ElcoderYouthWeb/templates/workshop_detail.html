@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ workshop.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title">{{ workshop.title }}</h1>
+                    <div class="workshop-meta mb-3">
+                        <span class="badge bg-primary me-2">
+                            {% if workshop.date > now %}Upcoming{% else %}Completed{% endif %}
+                        </span>
+                        <span class="text-muted">
+                            Instructor: {{ workshop.instructor.username }}
+                        </span>
+                    </div>
+                    
+                    <div class="workshop-details mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Workshop Details</h4>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-calendar-event"></i> <strong>Date:</strong> {{ workshop.date.strftime('%B %d, %Y') }}</li>
+                                    <li><i class="bi bi-clock"></i> <strong>Time:</strong> {{ workshop.date.strftime('%I:%M %p') }}</li>
+                                    <li><i class="bi bi-hourglass-split"></i> <strong>Duration:</strong> {{ workshop.duration }} minutes</li>
+                                    <li><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ workshop.location }}</li>
+                                    <li><i class="bi bi-people"></i> <strong>Availability:</strong> {{ workshop.current_participants }}/{{ workshop.max_participants }} spots filled</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workshop-description mb-4">
+                        <h4>Description</h4>
+                        <p>{{ workshop.description }}</p>
+                    </div>
+                    
+                    <div class="workshop-actions">
+                        {% if current_user.is_authenticated %}
+                            {% if workshop.date > now %}
+                                {% if is_registered %}
+                                    <p class="text-success"><i class="bi bi-check-circle"></i> You are registered for this workshop</p>
+                                    {% set registration = workshop.registrations|selectattr('user_id', 'equalto', current_user.id)|first %}
+                                    {% if registration %}
+                                        <a href="{{ url_for('cancel_registration', registration_id=registration.id) }}" 
+                                           class="btn btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to cancel your registration?')">
+                                            Cancel Registration
+                                        </a>
+                                    {% endif %}
+                                {% elif workshop.current_participants < workshop.max_participants %}
+                                    <a href="{{ url_for('register_workshop', workshop_id=workshop.id) }}" class="btn btn-primary">Register Now</a>
+                                {% else %}
+                                    <button class="btn btn-secondary" disabled>Workshop Full</button>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">This workshop has already taken place</span>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('login', next=url_for('workshop_detail', workshop_id=workshop.id)) }}" class="btn btn-primary">Login to Register</a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('workshop') }}" class="btn btn-outline-secondary ms-2">Back to Workshops</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

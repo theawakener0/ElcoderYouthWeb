@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Edit Post{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Edit Post</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required>{{ post.content }}</textarea>
+                    </div>
+                    
+                    <div class="mb-4 thumbnail-container">
+                        <label for="thumbnail" class="form-label fw-bold">
+                            <i class="bi bi-image-fill me-2"></i>Post Thumbnail
+                        </label>
+                        
+                        <div class="thumbnail-card">
+                            {% if post.thumbnail %}
+                            <div class="current-thumbnail">
+                                <div class="thumbnail-preview">
+                                    <img src="{{ url_for('static', filename='uploads/' + post.thumbnail) }}" 
+                                        alt="Post thumbnail" 
+                                        class="thumbnail-image">
+                                </div>
+                                <div class="thumbnail-info">
+                                    <p class="thumbnail-label">Current thumbnail</p>
+                                    <div class="form-check thumbnail-remove">
+                                        <input class="form-check-input" type="checkbox" id="remove_thumbnail" name="remove_thumbnail">
+                                        <label class="form-check-label" for="remove_thumbnail">
+                                            Remove current thumbnail
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="thumbnail-divider"></div>
+                            {% endif %}
+                            
+                            <div class="thumbnail-upload">
+                                <p class="upload-label">{% if post.thumbnail %}Replace with a new image:{% else %}Add a thumbnail image:{% endif %}</p>
+                                <div class="upload-control">
+                                    <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                                </div>
+                                <p class="upload-help">Recommended size: 800×400 pixels (16:9 ratio). Max file size: 2MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Update Post</button>
+                        <a href="{{ url_for('post', post_id=post.id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

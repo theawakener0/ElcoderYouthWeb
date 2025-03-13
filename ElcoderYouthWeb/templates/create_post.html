@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Create Post{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Create New Post</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                    </div>
+                    
+                    <div class="mb-4 thumbnail-container">
+                        <label for="thumbnail" class="form-label fw-bold">
+                            <i class="bi bi-image-fill me-2"></i>Post Thumbnail
+                        </label>
+                        
+                        <div class="thumbnail-card">
+                            <div class="thumbnail-upload">
+                                <p class="upload-label">Add a thumbnail image:</p>
+                                <div class="upload-control">
+                                    <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                                </div>
+                                <p class="upload-help">Recommended size: 800×400 pixels (16:9 ratio). Max file size: 2MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Create Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

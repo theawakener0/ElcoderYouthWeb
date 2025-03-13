@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Edit News{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            
+            <div class="card edit-news-card">
+                <div class="card-header">
+                    <h3 class="text-center edit-title">
+                        <i class="bi bi-pencil-square me-2"></i>Edit News Article
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="edit-news-form">
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ news.title }}" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select category-select" id="category" name="category" required>
+                                <option value="Announcement" {% if news.category == 'Announcement' %}selected{% endif %}>Announcement</option>
+                                <option value="Event" {% if news.category == 'Event' %}selected{% endif %}>Event</option>
+                                <option value="Update" {% if news.category == 'Update' %}selected{% endif %}>Update</option>
+                                <option value="Community" {% if news.category == 'Community' %}selected{% endif %}>Community</option>
+                                <option value="Tutorial" {% if news.category == 'Tutorial' %}selected{% endif %}>Tutorial</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="image_url" class="form-label">Image URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-image"></i></span>
+                                <input type="url" class="form-control" id="image_url" name="image_url" value="{{ news.image_url }}">
+                            </div>
+                            <div class="form-text">Enter a URL for an image to display with this news article.</div>
+                            
+                            {% if news.image_url %}
+                            <div class="image-preview mt-3">
+                                <label class="form-label">Current Image Preview:</label>
+                                <img src="{{ news.image_url }}" class="img-thumbnail preview-image" alt="Image preview">
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control content-editor" id="content" name="content" rows="12" required>{{ news.content }}</textarea>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i> You can use HTML formatting in your content.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-3 form-actions">
+                            <button type="submit" class="btn btn-primary update-btn">
+                                <i class="bi bi-check-circle me-2"></i>Update News
+                            </button>
+                            <a href="{{ url_for('manage_news') }}" class="btn btn-outline-secondary cancel-btn">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
