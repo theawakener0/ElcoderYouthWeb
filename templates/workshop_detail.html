@@ -25,7 +25,11 @@
                                     <li><i class="bi bi-clock"></i> <strong>Time:</strong> {{ workshop.date.strftime('%I:%M %p') }}</li>
                                     <li><i class="bi bi-hourglass-split"></i> <strong>Duration:</strong> {{ workshop.duration }} minutes</li>
                                     <li><i class="bi bi-geo-alt"></i> <strong>Location:</strong> {{ workshop.location }}</li>
-                                    <li><i class="bi bi-people"></i> <strong>Availability:</strong> {{ workshop.current_participants }}/{{ workshop.max_participants }} spots filled</li>
+                                    <li><i class="bi bi-people"></i> <strong>Participants:</strong> 
+                                        <span class="badge bg-{{ 'danger' if workshop.current_participants >= workshop.max_participants else 'success' }}">
+                                            {{ workshop.current_participants }}/{{ workshop.max_participants }}
+                                        </span>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

@@ -34,10 +34,14 @@
                                 {% elif workshop.current_participants < workshop.max_participants %}
                                     <a href="{{ url_for('register_workshop', workshop_id=workshop.id) }}" class="btn btn-primary">Register Now</a>
                                 {% else %}
-                                    <button class="btn btn-secondary" disabled>Workshop Full</button>
+                                    <div class="alert alert-warning py-2 mb-0">Workshop Full</div>
                                 {% endif %}
                             {% else %}
-                                <a href="{{ url_for('login', next=url_for('register_workshop', workshop_id=workshop.id)) }}" class="btn btn-primary">Login to Register</a>
+                                {% if workshop.current_participants < workshop.max_participants %}
+                                    <a href="{{ url_for('login', next=url_for('register_workshop', workshop_id=workshop.id)) }}" class="btn btn-primary">Login to Register</a>
+                                {% else %}
+                                    <div class="alert alert-warning py-2 mb-0">Workshop Full</div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>

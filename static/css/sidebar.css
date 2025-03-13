@@ -5,7 +5,7 @@
     height: 100vh;
     width: 250px;
     background-color: var(--bg-card, #121212);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     z-index: 1000;
     overflow-y: auto;
     box-shadow: var(--shadow-md);
@@ -24,7 +24,7 @@
 }
 
 .main-content {
-    transition: margin-left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     margin-left: 250px;
 }
 
@@ -55,6 +55,7 @@
     height: 0;
     overflow: hidden;
     display: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .sidebar.collapsed .sidebar-nav a {
@@ -169,7 +170,7 @@
 .sidebar-footer span,
 .sidebar-nav a,
 .sidebar-nav i {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-header {
@@ -319,6 +320,7 @@
 .sidebar.collapsed .sidebar-heading {
     opacity: 0;
     visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .sidebar.collapsed .sidebar-nav a {
@@ -347,7 +349,7 @@
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     z-index: 1000;
 }
 
@@ -358,10 +360,12 @@
 
 .sidebar.collapsed .sidebar-toggle {
     transform: rotate(180deg);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar.collapsed .sidebar-toggle:hover {
     transform: rotate(180deg) scale(1.1);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Navbar Sidebar Toggle Button */
@@ -386,21 +390,24 @@
     transform: scale(1.05);
 }
 
+/* Add smooth transition for navbar toggle */
 .navbar-sidebar-toggle i {
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-collapsed .navbar-sidebar-toggle i {
     transform: rotate(180deg);
 }
 
-/* Adjust body classes for sidebar state */
+/* Add smooth transition for body adjustments */
 body.sidebar-visible .main-content {
     margin-left: 250px;
+    transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.sidebar-collapsed .main-content {
     margin-left: 70px;
+    transition: margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (max-width: 991.98px) {

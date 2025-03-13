@@ -15,7 +15,7 @@ import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 
@@ -115,7 +115,7 @@ class Workshop(db.Model):
     duration = db.Column(db.Integer)  # Duration in minutes
     location = db.Column(db.String(200))
     max_participants = db.Column(db.Integer)
-    current_participants = db.Column(db.Integer, default=0)
+    current_participants = db.Column(db.Integer, default=0)  # Make sure this field exists
     instructor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     registration_open = db.Column(db.Boolean, default=True)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -138,10 +138,7 @@ def home():
 def blog():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=10)
-
-    return render_template('blog.html', posts=posts.items, pagination=posts)
-
-
+    return render_template('blog.html', posts=posts)
 
 @app.route('/apply', methods=['GET', 'POST'])
 def apply():
@@ -325,7 +322,7 @@ def create_workshop():
 
 
 
-ADMIN_CODE = 'AdminCodeElcoder'  # In production, use environment variables
+ADMIN_CODE = 'your-secret-admin-code'  # In production, use environment variables
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -546,7 +543,7 @@ def post(post_id):
 # Helper function for file uploads
 def allowed_file(filename, allowed_extensions):
     return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in allowed_extensions
+           filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 # Update workshop registration to use the new model
 @app.route('/workshop/<int:workshop_id>/register', methods=['GET', 'POST'])
@@ -573,68 +570,28 @@ def register_workshop(workshop_id):
         flash('You are already registered for this workshop.', 'info')
         return redirect(url_for('workshop'))
     
-    if request.method == 'POST':
-        # Process the registration
-        registration = WorkshopRegistration(
-            user_id=current_user.id,
-            workshop_id=workshop.id
-        )
-        
-        db.session.add(registration)
-        
-        try:
-            db.session.commit()
-            flash('You have successfully registered for this workshop!', 'success')
-            return redirect(url_for('user_workshops'))
-        except Exception as e:
-            db.session.rollback()
-            flash('An error occurred during registration. Please try again.', 'danger')
-            print(str(e))  # Log the error
+    # Process the registration
+    registration = WorkshopRegistration(
+        user_id=current_user.id,
+        workshop_id=workshop.id
+    )
     
-    # For GET requests, show the registration confirmation page
-    return render_template('register_workshop.html', workshop=workshop)
-
-# Add dashboard for users
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    user_workshops = WorkshopRegistration.query.filter_by(user_id=current_user.id).all()
-    workshops = []
-    for reg in user_workshops:
-        workshop = Workshop.query.get(reg.workshop_id)
-        if workshop:
-            workshops.append({
-                'workshop': workshop,
-                'registration': reg
-            })
+    db.session.add(registration)
     
-    return render_template('dashboard.html', workshops=workshops)
-
-@property
-def current_participants(self):
-    return WorkshopRegistration.query.filter_by(workshop_id=self.id).count()
-
-# Add this property to check if a user is registered
-def is_user_registered(self, user):
-    return WorkshopRegistration.query.filter_by(workshop_id=self.id, user_id=user.id).first() is not None
-
-@app.route('/my-workshops')
-@login_required
-def user_workshops():
-    registrations = WorkshopRegistration.query.filter_by(user_id=current_user.id).all()
-    workshops = []
+    # Increment the participant count
+    workshop.current_participants += 1
     
-    for registration in registrations:
-        workshop = Workshop.query.get(registration.workshop_id)
-        if workshop:
-            workshops.append({
-                'workshop': workshop,
-                'registration': registration
-            })
-    
-    return render_template('user_workshops.html', workshops=workshops, now=datetime.utcnow())
+    try:
+        db.session.commit()
+        flash('You have successfully registered for this workshop!', 'success')
+        return redirect(url_for('user_workshops'))
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred during registration. Please try again.', 'danger')
+        print(str(e))  # Log the error
+        return redirect(url_for('workshop'))
 
-@app.route('/workshop/cancel-registration/<int:registration_id>', methods=['GET'])
+@app.route('/workshop/cancel-registration/<int:registration_id>', methods=['GET', 'POST'])
 @login_required
 def cancel_registration(registration_id):
     registration = WorkshopRegistration.query.get_or_404(registration_id)
@@ -651,9 +608,13 @@ def cancel_registration(registration_id):
         return redirect(url_for('user_workshops'))
     
     try:
+        # Decrement the participant count
+        if workshop.current_participants > 0:
+            workshop.current_participants -= 1
+            
         db.session.delete(registration)
         db.session.commit()
-        flash('Your registration has been cancelled successfully.', 'success')
+        flash('Your registration has been cancelled.', 'success')
     except Exception as e:
         db.session.rollback()
         flash('An error occurred while cancelling your registration.', 'danger')
@@ -931,5 +892,48 @@ def admin_delete_user(user_id):
     flash(f'User {user.username} has been deleted.', 'success')
     return redirect(url_for('admin_users'))
 
+ #Add this function to update all workshop participant counts
+@app.route('/admin/update-workshop-counts', methods=['GET'])
+@login_required
+def update_workshop_counts():
+    if not current_user.is_admin:
+        flash('Only administrators can access this function.', 'danger')
+        return redirect(url_for('home'))
+        
+    workshops = Workshop.query.all()
+    updated = 0
+    
+    for workshop in workshops:
+        # Count actual registrations
+        actual_count = WorkshopRegistration.query.filter_by(workshop_id=workshop.id).count()
+        
+        # Update if different
+        if workshop.current_participants != actual_count:
+            workshop.current_participants = actual_count
+            updated += 1
+    
+    db.session.commit()
+    flash(f'Updated participant counts for {updated} workshops.', 'success')
+    return redirect(url_for('manage_workshops'))
 
+# Add this route to view user's registered workshops
+@app.route('/user/workshops')
+@login_required
+def user_workshops():
+    # Get user's registered workshops
+    user_registrations = WorkshopRegistration.query.filter_by(user_id=current_user.id).all()
+    
+    # Get the workshop objects
+    registrations = []
+    for registration in user_registrations:
+        registrations.append(registration)
+    
+    return render_template('user_workshops.html', registrations=registrations, now=datetime.utcnow())
+
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
 
